@@ -4,7 +4,10 @@
   "description": "Hide the difficulty of a LeetCode Problem on the page",
   "content_scripts": [
     {
-      "matches": ["https://leetcode.com/*"],
+      "matches": [
+        "https://leetcode.com/problemset/all/",
+        "https://leetcode.com/problems/*"
+      ],
       "js": ["index.js"]
     }
   ],
