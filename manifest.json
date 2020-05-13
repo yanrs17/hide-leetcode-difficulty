@@ -1,0 +1,13 @@
+{
+  "name": "Hide LeetCode Difficulty",
+  "version": "1.0",
+  "description": "Hide the difficulty of a LeetCode Problem on the page",
+  "content_scripts": [
+    {
+      "matches": ["https://leetcode.com/*"],
+      "js": ["index.js"]
+    }
+  ],
+  "icons": { "32": "lc-32x32.png" },
+  "manifest_version": 2
+}
