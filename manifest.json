@@ -1,7 +1,7 @@
 {
   "name": "Hide LeetCode Difficulty",
   "version": "1.0",
-  "description": "Hide the difficulty of a LeetCode Problem on the page",
+  "description": "Hide the difficulty of problems on LeetCode",
   "content_scripts": [
     {
       "matches": [
