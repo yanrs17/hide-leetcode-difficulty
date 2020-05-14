@@ -11,6 +11,6 @@
       "js": ["index.js"]
     }
   ],
-  "icons": { "32": "lc-32x32.png" },
+  "icons": { "128": "icon_128.png" },
   "manifest_version": 2
 }
