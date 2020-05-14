@@ -57,7 +57,7 @@
       var head = document.head;
       var styleEle = document.createElement('style');
       var rule =
-        'div.next-challenge__A4ZV > a.next-challenge-btn__L_19 { background-color: lavender; color: purple; border-color: purple; }';
+        'div.next-challenge__A4ZV > a.next-challenge-btn__L_19 { background-color: lavender; color: purple; border-color: purple; } div.next-challenge__A4ZV > a.next-challenge-btn__L_19:hover { background-color: lavender; color: purple; border-color: purple; }';
       styleEle.type = 'text/css';
       if (styleEle.styleSheet) {
         css.styleSheet.cssText = rule;
