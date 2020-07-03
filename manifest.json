@@ -1,6 +1,6 @@
 {
   "name": "Hide LeetCode Difficulty",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Hide the difficulty of problems on LeetCode",
   "content_scripts": [
     {
@@ -8,9 +8,12 @@
         "https://leetcode.com/problemset/all/",
         "https://leetcode.com/problems/*"
       ],
-      "js": ["index.js"]
+      "js": ["content-script.js"]
     }
   ],
   "icons": { "128": "icon_128.png" },
-  "manifest_version": 2
+  "manifest_version": 2,
+  "browser_action": {
+    "default_popup": "popup.html"
+  }
 }

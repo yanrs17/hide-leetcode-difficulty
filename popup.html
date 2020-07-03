@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      #radio-group {
+        display: flex;
+        flex-direction: column;
+      }
+      form {
+        width: 150px;
+      }
+    </style>
+  </head>
+  <body>
+    <form>
+      <input type="checkbox" id="checkbox" checked />
+      <label for="checkbox">Extension Active</label>
+      <div id="radio-group">
+        <div>
+          <input
+            type="radio"
+            name="hide"
+            value="easy-med"
+            id="easy-med"
+            class="dis"
+          />
+          <label class="dis" for="easy-med">Hide Easy/Medium</label>
+        </div>
+        <div>
+          <input
+            type="radio"
+            name="hide"
+            value="med-hard"
+            id="med-hard"
+            class="dis"
+          />
+          <label class="dis" for="med-hard">Hide Medium/Hard</label>
+        </div>
+        <div>
+          <input type="radio" name="hide" value="all" id="all" class="dis" />
+          <label class="dis" for="all">Hide All</label>
+        </div>
+      </div>
+      <input type="checkbox" id="checkbox-reveal" checked />
+      <label for="checkbox-reveal"
+        >Reveal Difficulty Once Solved (this feature is not yet live)</label
+      >
+    </form>
+    <script type="text/javascript" src="popup.js"></script>
+  </body>
+</html>
