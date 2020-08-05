@@ -1,7 +1,9 @@
-const appendStyleToPage = (rule, id) => {
+const appendStyleToPage = (rule, id, isDifficultyStyle) => {
   const styleNode = document.createElement('style');
   styleNode.setAttribute('id', id);
   styleNode.classList.add('hide-lc-difficulty-style-node');
+  if (isDifficultyStyle)
+    styleNode.classList.add('hide-lc-difficulty-style-node-difficulty');
   styleNode.type = 'text/css';
   if (styleNode.styleSheet) {
     css.styleSheet.cssText = rule;
@@ -55,6 +57,7 @@ const medHardRule = `
     border-color: orangered;
   }
 `;
+
 const hideAllRule = `
   td > span.round.label {
     background-color: purple;
@@ -81,16 +84,31 @@ const hideAllRule = `
   }
 `;
 
+const hideAcceptanceRule = `
+  td:nth-child(5) {
+    color: transparent;
+  }
+
+  div.css-oqu510 {
+    visibility: hidden;
+  }
+`;
+
 const removeAllCSS = () => {
   const nodes = document.querySelectorAll(
-    'style.hide-lc-difficulty-style-node'
+    'style.hide-lc-difficulty-style-node-difficulty',
   );
   nodes.forEach(ele => document.head.removeChild(ele));
 };
 
+const removeAcceptanceCSS = id => {
+  const node = document.getElementById(id);
+  if (node) document.head.removeChild(node);
+};
+
 const resetProblemSetAll = () => {
   let spanList = document.querySelectorAll(
-    'td > span.round.label.label-success'
+    'td > span.round.label.label-success',
   );
   spanList.forEach(span => (span.innerText = 'Easy'));
   spanList = document.querySelectorAll('td > span.round.label.label-warning');
@@ -129,15 +147,21 @@ const removeListeners = () => {
   const pagination = document.querySelector('tbody.reactable-pagination');
   const select = document.querySelector('select.form-control');
 
-  if (header) header.removeEventListener('click', changeToEasyMed);
-  if (header) header.removeEventListener('click', changeToMedHard);
-  if (header) header.removeEventListener('click', changeToHideAll);
-  if (pagination) pagination.removeEventListener('click', changeToEasyMed);
-  if (pagination) pagination.removeEventListener('click', changeToMedHard);
-  if (pagination) pagination.removeEventListener('click', changeToHideAll);
-  if (select) select.removeEventListener('change', changeToEasyMed);
-  if (select) select.removeEventListener('change', changeToMedHard);
-  if (select) select.removeEventListener('change', changeToHideAll);
+  if (header) {
+    header.removeEventListener('click', changeToEasyMed);
+    header.removeEventListener('click', changeToMedHard);
+    header.removeEventListener('click', changeToHideAll);
+  }
+  if (pagination) {
+    pagination.removeEventListener('click', changeToEasyMed);
+    pagination.removeEventListener('click', changeToMedHard);
+    pagination.removeEventListener('click', changeToHideAll);
+  }
+  if (select) {
+    select.removeEventListener('change', changeToEasyMed);
+    select.removeEventListener('change', changeToMedHard);
+    select.removeEventListener('change', changeToHideAll);
+  }
 };
 
 const resetAllDifficulty = () => {
@@ -194,11 +218,11 @@ const changeToEasyMed = () => {
   setTimeout(() => {
     resetProblemSetAll();
     if (!document.getElementById('hide-lc-difficulty-easy-med')) {
-      appendStyleToPage(easyMedRule, 'hide-lc-difficulty-easy-med');
+      appendStyleToPage(easyMedRule, 'hide-lc-difficulty-easy-med', true);
     }
 
     let spanList = document.querySelectorAll(
-      'td > span.round.label.label-warning, td > span.round.label.label-success'
+      'td > span.round.label.label-warning, td > span.round.label.label-success',
     );
     spanList.forEach(span => (span.innerText = 'Easy/Medium'));
 
@@ -214,11 +238,11 @@ const changeToMedHard = () => {
   setTimeout(() => {
     resetProblemSetAll();
     if (!document.getElementById('hide-lc-difficulty-med-hard')) {
-      appendStyleToPage(medHardRule, 'hide-lc-difficulty-med-hard');
+      appendStyleToPage(medHardRule, 'hide-lc-difficulty-med-hard', true);
     }
 
     let spanList = document.querySelectorAll(
-      'td > span.round.label.label-danger, td > span.round.label.label-warning'
+      'td > span.round.label.label-danger, td > span.round.label.label-warning',
     );
     spanList.forEach(span => (span.innerText = 'Medium/Hard'));
 
@@ -229,11 +253,12 @@ const changeToMedHard = () => {
     }
   }, 100);
 };
+
 const changeToHideAll = () => {
   setTimeout(() => {
     resetProblemSetAll();
     if (!document.getElementById('hide-lc-difficulty-hide-all')) {
-      appendStyleToPage(hideAllRule, 'hide-lc-difficulty-hide-all');
+      appendStyleToPage(hideAllRule, 'hide-lc-difficulty-hide-all', true);
     }
 
     let spanList = document.querySelectorAll('td > span.round.label');
@@ -263,23 +288,85 @@ const changePageContent = arg => {
   });
 };
 
+// when page loads, get the state and update the page accordingly
 chrome.storage.local.get(
-  ['hidelcActive', 'hidelcRule'],
-  ({ hidelcActive, hidelcRule }) => {
-    if (hidelcActive) {
-      changePageContent(hidelcRule);
-    }
-  }
+  ['hidelcActive', 'hidelcRule', 'hidelcAcceptance'],
+  ({ hidelcActive, hidelcRule, hidelcAcceptance }) => {
+    if (hidelcActive) changePageContent(hidelcRule);
+    if (hidelcAcceptance)
+      appendStyleToPage(
+        hideAcceptanceRule,
+        'hide-lc-difficulty-style-node-acceptance',
+        false,
+      );
+  },
 );
 
-chrome.runtime.onMessage.addListener(({ hidelcRule, hidelcActive }) => {
-  if (hidelcActive === false) {
-    resetAllDifficulty();
-  } else if (!hidelcRule) {
-    chrome.storage.local.get(['hidelcRule'], ({ hidelcRule }) => {
+// accepting events
+chrome.runtime.onMessage.addListener(
+  ({ hidelcRule, hidelcActive, hidelcRevealEvent, hidelcAcceptance }) => {
+    //handles difficulty
+    if (hidelcActive === false) {
+      resetAllDifficulty();
+      removeAcceptanceCSS('hide-lc-difficulty-style-node-acceptance');
+    } else if (hidelcActive === true) {
+      chrome.storage.local.get(
+        ['hidelcRule', 'hidelcRule', 'hidelcAcceptance'],
+        ({ hidelcRule, hidelcAcceptance }) => {
+          changePageContent(hidelcRule);
+          if (hidelcAcceptance) {
+            appendStyleToPage(
+              hideAcceptanceRule,
+              'hide-lc-difficulty-style-node-acceptance',
+              false,
+            );
+          }
+        },
+      );
+    } else if (hidelcActive === undefined && hidelcRule) {
       changePageContent(hidelcRule);
-    });
-  } else {
-    changePageContent(hidelcRule);
-  }
-});
+    }
+
+    // hides acceptance rate
+    if (hidelcAcceptance) {
+      appendStyleToPage(
+        hideAcceptanceRule,
+        'hide-lc-difficulty-style-node-acceptance',
+        false,
+      );
+    } else if (hidelcAcceptance === false) {
+      removeAcceptanceCSS('hide-lc-difficulty-style-node-acceptance');
+    }
+
+    // handles reveal
+    if (hidelcRevealEvent) {
+      const ele =
+        document.querySelector('.css-14oi08n') ||
+        document.querySelector('.css-dcmtd5') ||
+        document.querySelector('.css-t42afm');
+      const difficulty = ele.getAttribute('diff');
+      const spanText = document.createTextNode(
+        `${difficulty[0].toUpperCase()}${difficulty.slice(1)}`,
+      );
+      const span = document.createElement('span');
+      span.className = document.querySelector('.css-10o4wqw > div').className;
+      span.style.margin = 0;
+      span.style['font-size'] = '20px';
+      span.appendChild(spanText);
+      const div = document.createElement('div');
+      div.appendChild(
+        document.createTextNode(
+          `You solved a${difficulty[0] === 'e' ? 'n' : ''} `,
+        ),
+      );
+      div.appendChild(span);
+      div.appendChild(document.createTextNode(' problem!'));
+
+      const parent = document.querySelector(
+        'div.submissions__1ROo > div.result-container__33Nb > div.container__nthg',
+      );
+      parent.insertBefore(div, parent.children[1]);
+      chrome.storage.local.set({ hidelcSubmitted: false });
+    }
+  },
+);

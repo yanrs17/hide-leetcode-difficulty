@@ -13,8 +13,10 @@
   </head>
   <body>
     <form>
-      <input type="checkbox" id="checkbox" />
-      <label for="checkbox">Extension Active</label>
+      <div>
+        <input type="checkbox" id="checkbox" />
+        <label for="checkbox">Extension Active</label>
+      </div>
       <div id="radio-group">
         <div>
           <input
@@ -40,11 +42,25 @@
           <input type="radio" name="hide" value="all" id="all" class="dis" />
           <label class="dis" for="all">Hide All</label>
         </div>
+        <div>
+          <input
+            type="radio"
+            name="hide"
+            value="hide-none"
+            id="hide-none"
+            class="dis"
+          />
+          <label class="dis" for="hide-none">Hide None</label>
+        </div>
       </div>
-      <!-- <input type="checkbox" id="checkbox-reveal" />
-      <label for="checkbox-reveal"
-        >Reveal Difficulty Once Solved (this feature is not yet live)</label
-      > -->
+      <div>
+        <input type="checkbox" id="checkbox-reveal" />
+        <label class="dis" for="checkbox-reveal">Reveal On Solve</label>
+      </div>
+      <div>
+        <input type="checkbox" id="checkbox-acceptance" />
+        <label class="dis" for="checkbox-acceptance">Hide Acceptance %</label>
+      </div>
     </form>
     <script type="text/javascript" src="popup.js"></script>
   </body>
