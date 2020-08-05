@@ -19,7 +19,13 @@
   },
   "background": {
     "scripts": ["background.js"],
-    "persistent": false
+    "persistent": true
   },
-  "permissions": ["storage", "tabs"]
+  "permissions": [
+    "storage",
+    "tabs",
+    "webRequest",
+    "https://leetcode.com/graphql",
+    "https://leetcode.com/problems/*/submit/"
+  ]
 }

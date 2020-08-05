@@ -55,6 +55,7 @@ const medHardRule = `
     border-color: orangered;
   }
 `;
+
 const hideAllRule = `
   td > span.round.label {
     background-color: purple;
@@ -81,16 +82,26 @@ const hideAllRule = `
   }
 `;
 
+const hideAcceptanceRule = `
+  td:nth-child(5) {
+    color: transparent;
+  }
+
+  div.css-oqu510 {
+    visibility: hidden;
+  }
+`;
+
 const removeAllCSS = () => {
   const nodes = document.querySelectorAll(
-    'style.hide-lc-difficulty-style-node'
+    'style.hide-lc-difficulty-style-node',
   );
   nodes.forEach(ele => document.head.removeChild(ele));
 };
 
 const resetProblemSetAll = () => {
   let spanList = document.querySelectorAll(
-    'td > span.round.label.label-success'
+    'td > span.round.label.label-success',
   );
   spanList.forEach(span => (span.innerText = 'Easy'));
   spanList = document.querySelectorAll('td > span.round.label.label-warning');
@@ -198,7 +209,7 @@ const changeToEasyMed = () => {
     }
 
     let spanList = document.querySelectorAll(
-      'td > span.round.label.label-warning, td > span.round.label.label-success'
+      'td > span.round.label.label-warning, td > span.round.label.label-success',
     );
     spanList.forEach(span => (span.innerText = 'Easy/Medium'));
 
@@ -218,7 +229,7 @@ const changeToMedHard = () => {
     }
 
     let spanList = document.querySelectorAll(
-      'td > span.round.label.label-danger, td > span.round.label.label-warning'
+      'td > span.round.label.label-danger, td > span.round.label.label-warning',
     );
     spanList.forEach(span => (span.innerText = 'Medium/Hard'));
 
@@ -269,17 +280,50 @@ chrome.storage.local.get(
     if (hidelcActive) {
       changePageContent(hidelcRule);
     }
-  }
+  },
 );
 
-chrome.runtime.onMessage.addListener(({ hidelcRule, hidelcActive }) => {
-  if (hidelcActive === false) {
-    resetAllDifficulty();
-  } else if (!hidelcRule) {
-    chrome.storage.local.get(['hidelcRule'], ({ hidelcRule }) => {
+chrome.runtime.onMessage.addListener(
+  ({ hidelcRule, hidelcActive, hidelcReveal }) => {
+    if (hidelcActive === false) {
+      resetAllDifficulty();
+    } else if (!hidelcRule) {
+      chrome.storage.local.get(['hidelcRule'], ({ hidelcRule }) => {
+        changePageContent(hidelcRule);
+      });
+    } else {
       changePageContent(hidelcRule);
-    });
-  } else {
-    changePageContent(hidelcRule);
-  }
-});
+    }
+
+    if (hidelcReveal) {
+      const ele =
+        document.querySelector('.css-14oi08n') ||
+        document.querySelector('.css-dcmtd5') ||
+        document.querySelector('.css-t42afm');
+      const difficulty = ele.getAttribute('diff');
+      const spanText = document.createTextNode(
+        `${difficulty[0].toUpperCase()}${difficulty.slice(1)}`,
+      );
+      const span = document.createElement('span');
+      span.className = document.querySelector('.css-10o4wqw > div').className;
+      span.style.margin = 0;
+      span.style['font-size'] = '20px';
+      span.appendChild(spanText);
+      const div = document.createElement('div');
+      div.appendChild(
+        document.createTextNode(
+          `You solved a${difficulty[0] === 'e' ? 'n' : ''} `,
+        ),
+      );
+      div.appendChild(span);
+      div.appendChild(document.createTextNode(' problem!'));
+
+      const parent = document.querySelector(
+        'div.submissions__1ROo > div.result-container__33Nb > div.container__nthg',
+      );
+      parent.insertBefore(div, parent.children[1]);
+    }
+  },
+);
+
+appendStyleToPage(hideAcceptanceRule, '');
