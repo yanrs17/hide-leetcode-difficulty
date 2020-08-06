@@ -6,29 +6,38 @@ chrome.runtime.onMessage.addListener();
 // within 15 seconds of each other, it's a solve
 chrome.webRequest.onCompleted.addListener(
   ({ url }) => {
-    chrome.storage.local.get(['hidelcReveal'], ({ hidelcReveal }) => {
-      // if this feature is disabled, return
-      if (!hidelcReveal) return;
-      if (
-        url.includes('https://leetcode.com/problems/') &&
-        url.includes('/submit/')
-      ) {
-        chrome.storage.local.set({ hidelcSubmitted: true });
-        // disables the reveal if no graphql request is made in 15 seconds
-        setTimeout(
-          () => chrome.storage.local.set({ hidelcSubmitted: false }),
-          1000 * 15,
-        );
-      } else if (url === 'https://leetcode.com/graphql') {
-        chrome.storage.local.get(['hidelcSubmitted'], ({ hidelcSubmitted }) => {
-          // disables the reveal if no problem/submit request has been made in the last 15 seconds
-          if (!hidelcSubmitted) return;
-          chrome.tabs.query({ active: true }, tabs => {
-            chrome.tabs.sendMessage(tabs[0].id, { hidelcRevealEvent: true });
-          });
-        });
-      }
-    });
+    chrome.storage.local.get(
+      ['hidelcReveal', 'hidelcActive'],
+      ({ hidelcReveal, hidelcActive }) => {
+        // if the extension and feature are active
+        if (hidelcReveal && hidelcActive) {
+          if (
+            url.includes('https://leetcode.com/problems/') &&
+            url.includes('/submit/')
+          ) {
+            chrome.storage.local.set({ hidelcSubmitted: true });
+            // disables the reveal if no graphql request is made in 15 seconds
+            setTimeout(
+              () => chrome.storage.local.set({ hidelcSubmitted: false }),
+              1000 * 15,
+            );
+          } else if (url === 'https://leetcode.com/graphql') {
+            chrome.storage.local.get(
+              ['hidelcSubmitted'],
+              ({ hidelcSubmitted }) => {
+                // disables the reveal if no problem/submit request has been made in the last 15 seconds
+                if (!hidelcSubmitted) return;
+                chrome.tabs.query({ active: true }, tabs => {
+                  chrome.tabs.sendMessage(tabs[0].id, {
+                    hidelcRevealEvent: true,
+                  });
+                });
+              },
+            );
+          }
+        }
+      },
+    );
   },
   {
     urls: [
