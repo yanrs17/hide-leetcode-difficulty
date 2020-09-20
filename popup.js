@@ -54,8 +54,8 @@ checkbox.addEventListener('change', () => {
 
 checkbox.addEventListener('change', () => {
   chrome.tabs.query({ url }, tabs => {
+    chrome.storage.local.set({ hidelcActive: checkbox.checked });
     tabs.forEach(({ id }) => {
-      chrome.storage.local.set({ hidelcActive: checkbox.checked });
       chrome.tabs.sendMessage(id, { hidelcActive: checkbox.checked });
     });
   });

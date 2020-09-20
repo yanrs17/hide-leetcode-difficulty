@@ -12,7 +12,7 @@
       "run_at": "document_end"
     }
   ],
-  "icons": { "128": "icon_128.png" },
+  "icons": { "128": "icon.png" },
   "manifest_version": 2,
   "browser_action": {
     "default_popup": "popup.html"
